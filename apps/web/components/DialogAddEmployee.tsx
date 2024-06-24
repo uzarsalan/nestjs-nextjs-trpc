@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useMutation } from "@tanstack/react-query";
-import { EmployeeInput, Employees } from "@web/types/trpc";
-import { trpc } from "@web/app/trpc";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { EmployeeInput } from "@web/types/trpc";
 import { EmployeeForm } from "./EmployeeForm";
+import { trpc } from "@web/utils/trpc";
 
 const DialogAddEmployee = () => {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const { mutateAsync: addEmployee } = useMutation({
-    mutationKey: ["employees"],
-    mutationFn: (data: EmployeeInput) => trpc.createEmployee.query(data),
+  const { mutateAsync: addEmployee } = trpc.createEmployee.useMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setOpen(false);
+    },
   });
 
   return (
@@ -26,7 +29,6 @@ const DialogAddEmployee = () => {
           <EmployeeForm
             onSubmitForm={async (data) => {
               await addEmployee(data);
-              setOpen(false);
             }}
           />
         </Dialog.Content>

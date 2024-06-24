@@ -6,11 +6,8 @@ import { NodesTree } from "./providers/NodesTree";
 import { Employee } from "@web/types/trpc";
 import { EditEmployeeId } from "./providers/EditEmployeeId";
 
-export function PageProviders({
-  children,
-  employees,
-}: PropsWithChildren<{ employees: Employee[] | null }>) {
-  const nodesTree = useNodesTree(employees ?? []);
+export function PageProviders({ children }: PropsWithChildren) {
+  const nodesTree = useNodesTree([]);
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(
     null
   );

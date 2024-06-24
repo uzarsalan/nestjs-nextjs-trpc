@@ -39,7 +39,6 @@ export default function Clientside() {
               )}
             </svg>
           </div>
-          <div className="absolute inset-0 bg-[linear-gradient(330deg,hsl(272,53%,50%)_0%,hsl(226,68%,56%)_100%)] -z-20"></div>
         </div>
       </ScrollContainer>
       <div className="absolute bottom-10 right-10">

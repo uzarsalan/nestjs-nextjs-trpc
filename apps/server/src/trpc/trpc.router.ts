@@ -4,8 +4,6 @@ import { createEmployeeSchema } from '@server/employee/validation/create-employe
 import { TrpcService } from '@server/trpc/trpc.service';
 import * as trpcExpress from '@trpc/server/adapters/express';
 import { deleteEmployeeSchema } from '../employee/validation/delete-employee.schema';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { Employee } from '@server/employee/employee.entity';
 import { updateEmployeeSchema } from '@server/employee/validation/update-employee.schema';
 
 @Injectable()
@@ -21,7 +19,7 @@ export class TrpcRouter {
     }),
     createEmployee: this.trpc.procedure
       .input(createEmployeeSchema)
-      .query(({ input }) => {
+      .mutation(({ input }) => {
         return this.employeeService.createEmployee({
           ...input,
           head_id: input.head_id || undefined,
@@ -29,12 +27,12 @@ export class TrpcRouter {
       }),
     deleteEmployee: this.trpc.procedure
       .input(deleteEmployeeSchema)
-      .query(({ input }) => {
+      .mutation(({ input }) => {
         return this.employeeService.deleteEmployee(input.id);
       }),
     updateEmployee: this.trpc.procedure
       .input(updateEmployeeSchema)
-      .query(({ input }) => {
+      .mutation(({ input }) => {
         const { id, ...data } = input;
         return this.employeeService.updateEmployee(id, {
           ...data,

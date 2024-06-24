@@ -14,6 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import classnames from "classnames";
 import { trpc } from "@web/utils/trpc";
+import classNames from "classnames";
 
 type Values = EmployeeInput;
 
@@ -26,8 +27,6 @@ export function EmployeeForm<T>({
 }) {
   const { data: employees } = trpc.getEmployees.useQuery();
 
-  const queryClient = useQueryClient();
-
   const employee = employees?.find((item) => item.id === id);
 
   const {
@@ -35,7 +34,7 @@ export function EmployeeForm<T>({
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Values>({
     resolver: zodResolver(createEmployeeSchema),
     values: {
@@ -46,20 +45,19 @@ export function EmployeeForm<T>({
 
   const onSubmit: SubmitHandler<Values> = async (data) => {
     onSubmitForm && (await onSubmitForm(data));
-    await queryClient.invalidateQueries();
     reset();
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Dialog.Title className="text-mauve12 m-0 text-[17px] font-medium">
-        Новый сотрудник
+        {id ? "Редактирование сотрудника" : "Новый сотрудник"}
       </Dialog.Title>
       <Dialog.Description className="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
-        Укажите имя и руководителя сотрудника
+        Измените имя или руководителя сотрудника
       </Dialog.Description>
       {!!errors.name && (
         <div className="text-red-500 text-xs text-right">
-          {errors.name.message}
+          {errors.name.message?.toString()}
         </div>
       )}
       <fieldset className="mb-[15px] flex items-center gap-5">
@@ -77,7 +75,7 @@ export function EmployeeForm<T>({
       </fieldset>
       {!!errors.head_id && (
         <div className="text-red-500 text-xs text-right">
-          {errors.head_id?.message}
+          {errors.head_id.message?.toString()}
         </div>
       )}
       <fieldset className="mb-[15px] flex items-center gap-5">
@@ -130,9 +128,15 @@ export function EmployeeForm<T>({
       <div className="mt-[25px] flex justify-end">
         <button
           type="submit"
-          className="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none"
+          disabled={isSubmitting}
+          className={classNames(
+            "bg-green4 text-green11 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none",
+            isSubmitting
+              ? "bg-gray-100 hover:bg-gray-100"
+              : "bg-green4 hover:bg-green5"
+          )}
         >
-          {id ? "Сохранить" : "Создать"}
+          {isSubmitting ? "Сохранение..." : id ? "Сохранить" : "Создать"}
         </button>
       </div>
       <Dialog.Close asChild>

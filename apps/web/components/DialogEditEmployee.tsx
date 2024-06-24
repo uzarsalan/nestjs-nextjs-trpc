@@ -1,15 +1,18 @@
 import React, { useContext } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useMutation } from "@tanstack/react-query";
 import { UpdateEmployeeInput } from "@web/types/trpc";
-import { trpc } from "@web/app/trpc";
 import { EmployeeForm } from "./EmployeeForm";
 import { EditEmployeeId } from "@web/app/providers/EditEmployeeId";
+import { trpc } from "@web/utils/trpc";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DialogEditEmployee = ({ id }: { id?: string | null }) => {
-  const { mutateAsync: updateEmployee } = useMutation({
-    mutationKey: ["employees"],
-    mutationFn: (data: UpdateEmployeeInput) => trpc.updateEmployee.query(data),
+  const queryClient = useQueryClient();
+  const { mutateAsync: updateEmployee } = trpc.updateEmployee.useMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      setEditingEmployeeId && setEditingEmployeeId(null);
+    },
   });
   const { setEditingEmployeeId } = useContext(EditEmployeeId);
 
@@ -26,7 +29,6 @@ const DialogEditEmployee = ({ id }: { id?: string | null }) => {
             onSubmitForm={async (data) => {
               if (!id) return;
               await updateEmployee({ ...data, id });
-              setEditingEmployeeId && setEditingEmployeeId(null);
             }}
           />
         </Dialog.Content>

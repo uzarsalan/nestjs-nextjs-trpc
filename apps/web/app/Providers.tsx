@@ -1,8 +1,11 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactElement } from "react";
 import { trpc } from "@web/utils/trpc";
+import { NextComponentType, NextPageContext } from "next";
 
-export const Providers = trpc.withTRPC(({ children }: PropsWithChildren) => {
-  return children;
-});
+export const Providers = trpc.withTRPC(
+  ({ children }: { children: ReactElement<any, any> | null }) => {
+    return children;
+  }
+) as NextComponentType<NextPageContext, PropsWithChildren, PropsWithChildren>;

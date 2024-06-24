@@ -18,7 +18,7 @@ export function useNodesTree(employees: Employee[]) {
 
   const windowSize = useWindowSize();
 
-  const { data } = trpc.getEmployees.useQuery();
+  const [data] = trpc.getEmployees.useSuspenseQuery();
 
   useEffect(() => {
     setNodes(
