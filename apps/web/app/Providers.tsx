@@ -1,12 +1,8 @@
 "use client";
 
 import { PropsWithChildren } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { trpc } from "@web/utils/trpc";
 
-const queryClient = new QueryClient();
-
-export function Providers({ children }: PropsWithChildren) {
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-}
+export const Providers = trpc.withTRPC(({ children }: PropsWithChildren) => {
+  return children;
+});

@@ -1,9 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { trpc } from "@web/app/trpc";
 import { Edge } from "@web/components/NodeSubtree";
 import { Employee } from "@web/types/trpc";
 import { Ref, RefObject, useEffect, useState } from "react";
 import { useWindowSize } from "./useWindowSize";
+import { trpc } from "@web/utils/trpc";
 
 export type TreeNode = {
   data: Employee;
@@ -19,11 +18,7 @@ export function useNodesTree(employees: Employee[]) {
 
   const windowSize = useWindowSize();
 
-  const { data } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => trpc.getEmployees.query(),
-    initialData: employees,
-  });
+  const { data } = trpc.getEmployees.useQuery();
 
   useEffect(() => {
     setNodes(

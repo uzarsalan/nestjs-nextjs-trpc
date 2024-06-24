@@ -13,7 +13,7 @@ export const EmployeeNodeContextMenu = ({
     mutationKey: ["employees"],
     mutationFn: () => trpc.deleteEmployee.query({ id }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["employees"] });
+      await queryClient.invalidateQueries();
     },
   });
   const { setEditingEmployeeId } = useContext(EditEmployeeId);

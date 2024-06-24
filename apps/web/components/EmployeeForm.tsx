@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createEmployeeSchema } from "@server/employee/validation/create-employee.schema";
-import { EmployeeInput, UpdateEmployeeInput } from "@web/types/trpc";
+import { EmployeeInput } from "@web/types/trpc";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Select from "@radix-ui/react-select";
@@ -10,10 +10,10 @@ import {
   ChevronUpIcon,
   Cross2Icon,
 } from "@radix-ui/react-icons";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { trpc } from "@web/app/trpc";
+import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import classnames from "classnames";
+import { trpc } from "@web/utils/trpc";
 
 type Values = EmployeeInput;
 
@@ -24,10 +24,7 @@ export function EmployeeForm<T>({
   id?: string | null;
   onSubmitForm?: (data: Values) => Promise<T>;
 }) {
-  const { data: employees } = useQuery({
-    queryKey: ["employees"],
-    queryFn: () => trpc.getEmployees.query(),
-  });
+  const { data: employees } = trpc.getEmployees.useQuery();
 
   const queryClient = useQueryClient();
 
@@ -49,7 +46,7 @@ export function EmployeeForm<T>({
 
   const onSubmit: SubmitHandler<Values> = async (data) => {
     onSubmitForm && (await onSubmitForm(data));
-    await queryClient.invalidateQueries({ queryKey: ["employees"] });
+    await queryClient.invalidateQueries();
     reset();
   };
   return (
