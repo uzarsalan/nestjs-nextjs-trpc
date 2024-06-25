@@ -36,7 +36,7 @@ export class TrpcRouter {
         const { id, ...data } = input;
         return this.employeeService.updateEmployee(id, {
           ...data,
-          head_id: data.head_id || undefined,
+          head_id: data.head_id || null,
         });
       }),
   });

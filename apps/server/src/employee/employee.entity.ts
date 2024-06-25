@@ -27,7 +27,7 @@ export class Employee {
   name: string;
 
   @Column({ type: 'uuid', nullable: true })
-  head_id: string;
+  head_id: string | null;
 
   @ManyToOne(() => Employee, (employee) => employee.employees, {
     onDelete: 'SET NULL',

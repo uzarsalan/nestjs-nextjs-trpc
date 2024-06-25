@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createEmployeeSchema } from "@server/employee/validation/create-employee.schema";
-import { EmployeeInput } from "@web/types/trpc";
+import { Employee, EmployeeInput } from "@web/types/trpc";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Select from "@radix-ui/react-select";
@@ -10,13 +10,18 @@ import {
   ChevronUpIcon,
   Cross2Icon,
 } from "@radix-ui/react-icons";
-import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import classnames from "classnames";
 import { trpc } from "@web/utils/trpc";
 import classNames from "classnames";
 
 type Values = EmployeeInput;
+
+function getChildrens(parent: Employee, allEmployees: Employee[]): Employee[] {
+  return allEmployees
+    .filter((item) => item.head_id === parent.id)
+    .flatMap((item) => [item, ...getChildrens(item, allEmployees)]);
+}
 
 export function EmployeeForm<T>({
   id,
@@ -28,6 +33,16 @@ export function EmployeeForm<T>({
   const { data: employees } = trpc.getEmployees.useQuery();
 
   const employee = employees?.find((item) => item.id === id);
+
+  const childrens =
+    employee && employees ? getChildrens(employee, employees) : [];
+
+  const filteredEmployees = employees?.filter(
+    (item) =>
+      !employee ||
+      (item.id !== employee.id &&
+        !childrens.some((child) => child.id === item.id))
+  );
 
   const {
     register,
@@ -44,7 +59,11 @@ export function EmployeeForm<T>({
   });
 
   const onSubmit: SubmitHandler<Values> = async (data) => {
-    onSubmitForm && (await onSubmitForm(data));
+    onSubmitForm &&
+      (await onSubmitForm({
+        ...data,
+        head_id: data.head_id && data.head_id !== "null" ? data.head_id : null,
+      }));
     reset();
   };
   return (
@@ -109,7 +128,14 @@ export function EmployeeForm<T>({
                   </Select.ScrollUpButton>
                   <Select.Viewport className="p-[5px]">
                     <Select.Group>
-                      {employees?.map((employee) => (
+                      {[
+                        {
+                          id: "null",
+                          name: "Нет руководителя",
+                          value: "null",
+                        },
+                        ...(filteredEmployees ?? []),
+                      ]?.map((employee) => (
                         <SelectItem key={employee.id} value={employee.id}>
                           {employee.name}
                         </SelectItem>

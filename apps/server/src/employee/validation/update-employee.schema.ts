@@ -4,6 +4,6 @@ export const updateEmployeeSchema = z
   .object({
     id: z.string().uuid(),
     name: z.string().min(1),
-    head_id: z.string().uuid().nullable(),
+    head_id: z.string().nullable(),
   })
   .required();
